@@ -51,13 +51,13 @@ Pick a concept from a restaurant domain: a **menu item**, an **order**, or a **t
 
 Pick one field from Phase 2 that caused a silent bug (e.g. `price: number`).
 
-- [ ] Declare a branded type for it:
+- [완료] Declare a branded type for it:
   ```ts
   type Price = number & { readonly __brand: unique symbol }
   ```
-- [ ] Update your object type to use `Price` instead of `number`
-- [ ] Try assigning a raw `number` directly to a `Price` field — the compiler should now refuse
-- [ ] Do the same for at least one `string` field (e.g. `Email`, `TableId`, `ItemName`)
+- [완료] Update your object type to use `Price` instead of `number`
+- [완료] Try assigning a raw `number` directly to a `Price` field — the compiler should now refuse
+- [] Do the same for at least one `string` field (e.g. `Email`, `TableId`, `ItemName`)
 
 **Check your understanding:**
 
