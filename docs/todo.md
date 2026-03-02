@@ -7,8 +7,8 @@ Do not skip ahead — the point is to feel the pain first, then fix it.
 
 ## Phase 1 — Get the project running
 
-- [ ] Run `npm install` to install dependencies
-- [ ] Run `npm run dev` and confirm it executes without errors
+- [완료] Run `npm install` to install dependencies
+- [완료] Run `npm run dev` and confirm it executes without errors
 
 ---
 
@@ -18,24 +18,30 @@ Do not skip ahead — the point is to feel the pain first, then fix it.
 
 Pick a concept from a restaurant domain: a **menu item**, an **order**, or a **table**.
 
-- [ ] Define a plain object type using only `string`, `number`, and `boolean` fields
-- [ ] Create two or three instances of it with hardcoded values
-- [ ] Write a function that does something with those objects (e.g. calculates a total price, checks if a table is available)
-- [ ] Run it and confirm it works
+- [완료] Define a plain object type using only `string`, `number`, and `boolean` fields
+- [완료] Create two or three instances of it with hardcoded values
+- [완료] Write a function that does something with those objects (e.g. calculates a total price, checks if a table is available)
+- [완료] Run it and confirm it works
 
 **Now break it on purpose:**
 
-- [ ] Pass a negative price — does anything complain? No.
-- [ ] Swap two `string` arguments in a function call (e.g. pass a name where an email is expected) — does anything complain? No.
-- [ ] Write down which bugs slipped through silently
+- [완료] Pass a negative price — does anything complain? No.
+- [완료] Swap two `string` arguments in a function call (e.g. pass a name where an email is expected) — does anything complain? No.
+- [완료] Write down which bugs slipped through silently
+
+### Phase 2 notes (what slipped through silently)
+
+- `unitPrice: -8` was accepted and used in totals/revenue.
+- `quantity: -3` was accepted even though it is impossible in this domain.
+- Swapping `(customerName, customerEmail)` to `(customerEmail, customerName)` compiled and ran because both are plain `string`.
 
 > These are called **silent bugs**. The program runs, but the data is wrong. This is the problem we will fix.
 
 ## Phase 2.b
 
-- [ ] create a type for `Order`. It accepts only primitives
-- [ ] it doesn't check for negative prices, or impossible values
-- [ ] test it by passing a negative price, etc
+- [완료] create a type for `Order`. It accepts only primitives
+- [완료] it doesn't check for negative prices, or impossible values
+- [완료] test it by passing a negative price, etc
 
 ---
 
