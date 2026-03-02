@@ -1,10 +1,11 @@
 import { v4 as uuidv4 } from "uuid"
+import { Price } from "../branded-types.js"
 
 export type Order = {
 	id: string
 	customerName: string
 	customerEmail: string
-	unitPrice: number
+	unitPrice: Price
 	quantity: number
 	totalAmount: number
 	isPaid: boolean
@@ -15,7 +16,7 @@ export function runOrderPrimitiveDemo(): void {
 		id: uuidv4(),
 		customerName: "Martin",
 		customerEmail: "martin@example.com",
-		unitPrice: 12.5,
+		unitPrice: 12.5 as Price,
 		quantity: 2,
 		totalAmount: 25,
 		isPaid: true,
@@ -25,7 +26,7 @@ export function runOrderPrimitiveDemo(): void {
 		id: uuidv4(),
 		customerName: "Tristan",
 		customerEmail: "tristan@example.com",
-		unitPrice: -8, // silent bug
+		unitPrice: -8 as Price, // silent bug
 		quantity: 1,
 		totalAmount: -8,
 		isPaid: true,
@@ -35,7 +36,7 @@ export function runOrderPrimitiveDemo(): void {
 		id: uuidv4(),
 		customerName: "Maxim",
 		customerEmail: "maxim@example.com",
-		unitPrice: 14,
+		unitPrice: 14 as Price,
 		quantity: -3, // silent bug 002
 		totalAmount: -42,
 		isPaid: false,
