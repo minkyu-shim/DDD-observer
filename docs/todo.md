@@ -57,11 +57,11 @@ Pick one field from Phase 2 that caused a silent bug (e.g. `price: number`).
   ```
 - [완료] Update your object type to use `Price` instead of `number`
 - [완료] Try assigning a raw `number` directly to a `Price` field — the compiler should now refuse
-- [] Do the same for at least one `string` field (e.g. `Email`, `TableId`, `ItemName`)
+- [완료] Do the same for at least one `string` field (e.g. `Email`, `TableId`, `ItemName`)
 
 **Check your understanding:**
 
-- [ ] Can you explain in one sentence why `Price` and `number` are not the same type, even though `Price` is built from `number`?
+- [쌉가능] Can you explain in one sentence why `Price` and `number` are not the same type, even though `Price` is built from `number`?
 
 ---
 
@@ -71,14 +71,14 @@ Pick one field from Phase 2 that caused a silent bug (e.g. `price: number`).
 
 For each branded type from Phase 3:
 
-- [ ] Write a factory function that accepts a raw primitive and returns the branded type
-- [ ] Inside that function, throw an error if the value breaks a business rule (e.g. price cannot be negative, email must contain `@`)
-- [ ] Replace every direct object literal that sets those fields with a call to the factory function
-- [ ] Try passing an invalid value to the factory — it should throw immediately, not silently continue
+- [완료] Write a factory function that accepts a raw primitive and returns the branded type
+- [완료] Inside that function, throw an error if the value breaks a business rule (e.g. price cannot be negative, email must contain `@`)
+- [완료] Replace every direct object literal that sets those fields with a call to the factory function
+- [완료] Try passing an invalid value to the factory — it should throw immediately, not silently continue
 
 **Check your understanding:**
 
-- [ ] Where is the only place a `Price` value is now created? Is that one place easy to audit and change?
+- [완료] Where is the only place a `Price` value is now created? Is that one place easy to audit and change?
 
 ---
 

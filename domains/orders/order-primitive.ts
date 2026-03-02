@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid"
-import { Price, Email } from "../branded-types.js"
+import { Price, Email, Domain } from "../branded-types.js"
 
 export type Order = {
 	id: string
@@ -15,8 +15,8 @@ export function runOrderPrimitiveDemo(): void {
 	const orderOne: Order = {
 		id: uuidv4(),
 		customerName: "Martin",
-		customerEmail: "martin@example.com" as Email,
-		unitPrice: 12.5 as Price,
+		customerEmail: Domain.toEmail("martin@example.com"),
+		unitPrice: Domain.toPrice(12.5),
 		quantity: 2,
 		totalAmount: 25,
 		isPaid: true,
@@ -25,18 +25,18 @@ export function runOrderPrimitiveDemo(): void {
 	const orderTwo: Order = {
 		id: uuidv4(),
 		customerName: "Tristan",
-		customerEmail: "tristan@example.com" as Email,
-		unitPrice: -8 as Price, // silent bug
+		customerEmail: Domain.toEmail("tristan@example.com"),
+		unitPrice: Domain.toPrice(8),
 		quantity: 1,
-		totalAmount: -8,
+		totalAmount: 8,
 		isPaid: true,
 	}
 
 	const orderThree: Order = {
 		id: uuidv4(),
 		customerName: "Maxim",
-		customerEmail: "maxim@example.com" as Email,
-		unitPrice: 14 as Price,
+		customerEmail: Domain.toEmail("maxim@example.com"),
+		unitPrice: Domain.toPrice(14),
 		quantity: -3, // silent bug 002
 		totalAmount: -42,
 		isPaid: false,
@@ -62,4 +62,21 @@ export function runOrderPrimitiveDemo(): void {
 	const formatContact = (name: string, email: string): string => name + " <" + email + ">"
 	console.log("normal:", formatContact(orderOne.customerName, orderOne.customerEmail))
 	console.log("swapped args silent bug:", formatContact(orderOne.customerEmail, orderOne.customerName))
+
+	console.log("phase 4: invalid constructor input should throw")
+	try {
+		Domain.toPrice(-8)
+		console.log("unexpected: invalid price was accepted")
+	} catch (error) {
+		const message = error instanceof Error ? error.message : String(error)
+		console.log("expected price error:", message)
+	}
+
+	try {
+		Domain.toEmail("not-an-email")
+		console.log("unexpected: invalid email was accepted")
+	} catch (error) {
+		const message = error instanceof Error ? error.message : String(error)
+		console.log("expected email error:", message)
+	}
 }
