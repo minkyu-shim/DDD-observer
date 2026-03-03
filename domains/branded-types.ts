@@ -1,5 +1,6 @@
 export type Price = number & { readonly __brand: "Price" }
 export type Email = string & { readonly __brand: "Email" }
+export type Currency = string & { readonly __brand: "Currency" }
 
 export const Domain = {
 	toPrice: (val: number): Price => {
@@ -15,5 +16,12 @@ export const Domain = {
 			throw new Error("Invalid Email: local or domain part is missing")
 		}
 		return trimmed as Email
+	},
+	toCurrency: (val: string): Currency => {
+		const normalized = val.trim().toUpperCase()
+		if (normalized.length !== 3) {
+			throw new Error("Invalid Currency: expected 3-letter ISO code (e.g. EUR)")
+		}
+		return normalized as Currency
 	},
 }
