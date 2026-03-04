@@ -1,82 +1,136 @@
 import { v4 as uuidv4 } from "uuid"
-import { Price, Email, Domain } from "../branded-types.js"
+import { Domain, Email, Price } from "../branded-types.js"
+
+export type OrderId = string & { readonly __brand: unique symbol }
+
+export type OrderStatus = "open" | "closed" | "cancelled"
 
 export type Order = {
-	id: string
-	customerName: string
-	customerEmail: Email
-	unitPrice: Price
-	quantity: number
-	totalAmount: number
-	isPaid: boolean
+	readonly id: OrderId
+	readonly customerName: string
+	readonly customerEmail: Email
+	readonly unitPrice: Price
+	readonly quantity: number
+	readonly totalAmount: Price
+	readonly status: OrderStatus
 }
 
-export function runOrderPrimitiveDemo(): void {
-	const orderOne: Order = {
-		id: uuidv4(),
-		customerName: "Martin",
-		customerEmail: Domain.toEmail("martin@example.com"),
-		unitPrice: Domain.toPrice(12.5),
-		quantity: 2,
-		totalAmount: 25,
-		isPaid: true,
+const toOrderId = (): OrderId => {
+	return `order-${uuidv4()}` as OrderId
+}
+
+const toOrderPrice = (value: number): Price => {
+	if (value <= 0) throw new Error("Invalid amount: must be greater than 0")
+	if (!Number.isFinite(value)) throw new Error("Invalid amount: must be a finite number")
+	return Domain.toPrice(value)
+}
+
+const toItemCount = (count: number): number => {
+	if (!Number.isInteger(count)) throw new Error("Invalid quantity: must be a whole number")
+	if (count <= 0) throw new Error("Invalid quantity: must be greater than 0")
+	return count
+}
+
+export const createOrder = (
+	customerName: string,
+	customerEmail: string,
+	unitPrice: number,
+	quantity: number
+): Order => {
+	const name = customerName.trim()
+	if (name.length === 0) throw new Error("Invalid customerName: cannot be empty")
+
+	const validUnitPrice = Domain.toPrice(unitPrice)
+	const validQuantity = toItemCount(quantity)
+	const validEmail = Domain.toEmail(customerEmail)
+	const total = toOrderPrice(Number(validUnitPrice) * validQuantity)
+
+	return {
+		id: toOrderId(),
+		customerName: name,
+		customerEmail: validEmail,
+		unitPrice: validUnitPrice,
+		quantity: validQuantity,
+		totalAmount: total,
+		status: "open",
+	}
+}
+
+export const addItem = (order: Order, unitPrice: number, quantity: number): Order => {
+	if (order.status !== "open") {
+		throw new Error(`Cannot add item to an order with status ${order.status}`)
 	}
 
-	const orderTwo: Order = {
-		id: uuidv4(),
-		customerName: "Tristan",
-		customerEmail: Domain.toEmail("tristan@example.com"),
-		unitPrice: Domain.toPrice(8),
-		quantity: 1,
-		totalAmount: 8,
-		isPaid: true,
+	const validUnitPrice = toOrderPrice(unitPrice)
+	const validQuantity = toItemCount(quantity)
+	const lineAmount = toOrderPrice(Number(validUnitPrice) * validQuantity)
+
+	return {
+		...order,
+		unitPrice: validUnitPrice,
+		quantity: order.quantity + validQuantity,
+		totalAmount: toOrderPrice(Number(order.totalAmount) + Number(lineAmount)),
+	}
+}
+
+export const closeOrder = (order: Order): Order => {
+	if (order.status === "closed") {
+		throw new Error("Order is already closed")
+	}
+	if (order.status === "cancelled") {
+		throw new Error("Cannot close a cancelled order")
 	}
 
-	const orderThree: Order = {
-		id: uuidv4(),
-		customerName: "Maxim",
-		customerEmail: Domain.toEmail("maxim@example.com"),
-		unitPrice: Domain.toPrice(14),
-		quantity: -3, // silent bug 002
-		totalAmount: -42,
-		isPaid: false,
+	return {
+		...order,
+		status: "closed",
+	}
+}
+
+export const cancelOrder = (order: Order): Order => {
+	if (order.status === "cancelled") {
+		throw new Error("Order is already cancelled")
+	}
+	if (order.status === "closed") {
+		throw new Error("Cannot cancel a closed order")
 	}
 
-	const orders = [orderOne, orderTwo, orderThree]
-	console.log("phase 2 / order primitive draft")
-	console.log(orders)
-
-	for (let i = 0; i < orders.length; i++) {
-		const o = orders[i]
-		const calc = o.unitPrice * o.quantity
-		console.log("calc total for", o.id, "=>", calc)
+	return {
+		...order,
+		status: "cancelled",
 	}
+}
 
-	let paidRevenue = 0
-	for (let i = 0; i < orders.length; i++) {
-		if (orders[i].isPaid) paidRevenue += orders[i].totalAmount
-	}
-	console.log("paid revenue (can be wrong because data can be wrong):", paidRevenue)
+export function runOrderEntityDemo(): void {
+	console.log("phase 6 / order entity demo")
 
-	// same primitive type => easy to swap by accident
-	const formatContact = (name: string, email: string): string => name + " <" + email + ">"
-	console.log("normal:", formatContact(orderOne.customerName, orderOne.customerEmail))
-	console.log("swapped args silent bug:", formatContact(orderOne.customerEmail, orderOne.customerName))
+	const first = createOrder("Martin", "martin@example.com", 12.5, 2)
+	const second = createOrder("Tristan", "tristan@example.com", 8, 1)
+	console.log("two distinct orders have different ids:", first.id !== second.id)
 
-	console.log("phase 4: invalid constructor input should throw")
+	const withDrink = addItem(first, 4, 1)
+	console.log("after addItem (new object):", withDrink)
+	console.log("first remains unchanged:", first)
+
+	const closed = closeOrder(withDrink)
+	console.log("after closeOrder:", closed.status)
+
 	try {
-		Domain.toPrice(-8)
-		console.log("unexpected: invalid price was accepted")
+		addItem(closed, 2, 1)
+		console.log("unexpected: invalid state transition accepted")
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
-		console.log("expected price error:", message)
+		console.log("expected state error:", message)
 	}
 
 	try {
-		Domain.toEmail("not-an-email")
-		console.log("unexpected: invalid email was accepted")
+		closeOrder(closeOrder(second))
+		console.log("unexpected: double close accepted")
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
-		console.log("expected email error:", message)
+		console.log("expected close error:", message)
 	}
+
+	const cancelled = cancelOrder(second)
+	console.log("cancelled order status:", cancelled.status)
 }

@@ -1,4 +1,4 @@
-import { runMoneyValueObjectDemo } from "./domains/value-objects/money.js"
+import { runOrderEntityDemo } from "./domains/orders/order-primitive.js"
 
-console.log("running phase 5 demo from domains/value-objects ...")
-runMoneyValueObjectDemo()
+console.log("running phase 6 demo from domains/orders ...")
+runOrderEntityDemo()
